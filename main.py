@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 
 app.config['SECRET_KEY'] = config.password
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://vayermaking:vayertues@localhost/caloriezz'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:vayertues@localhost/caloriezz'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -23,7 +23,16 @@ class foods(db.Model):
         self.quantity_indentifier = quantity_indentifier
         self.calories = calories
 
+def calc(calories, quantity):
+    return calories * quantity
+
 def check_food_name(food_name, quantity):
+    data = foods.query.filter_by(food_name=food_name).first()
+    calories = data.calories
+    return calories * quantity
+
+'''def check_food_name2(food_name, quantity):
+    result = 0
     data = foods.query.all()
     for i in data:
         if(food_name == i.food_name):
@@ -34,16 +43,17 @@ def check_food_name(food_name, quantity):
             #...
             #
 
-            result = i.calories * quantity
-
-    return result
+            #result = i.calories * quantity
+            #return result
+            return calc(i.calories, quantity)
+    #return result'''
 @app.route('/', methods=['GET', 'POST'])
 def index():
     result = ""
     if request.method == "POST":
         details = request.form
         food_name = details['fname']
-        quantity = details['quantity']
+        quantity = int(details['quantity'])
         quantity_indentifier = details['quantity_indentifier']
         #result  = food_name + quantity_indentifier + str(quantity)
         #return result
@@ -65,4 +75,4 @@ def asdf():
     return result
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
